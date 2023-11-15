@@ -101,17 +101,24 @@ const stmfl = ['img/kan.png', 'img/hei.png', 'img/kai.png'];
           var iwid = stm[0].width;
           var ihgt = stm[0].height;
           var scl = (swid/10)/iwid;
+          let wstm = new Array();
           for (let i=0; i<nitem; i++){
               var bx=swid/2-iwid*scl*(nitem/2)+i*iwid*scl;
               var by=shgt/2-ihgt*scl*.5;
               var rnum = Math.random();
-              let wstm = 2 - (Number(rnum>thre1) + Number(rnum>thre2));
-              console.log(ctx);
-              ctx.drawImage(stm[wstm], bx, by, iwid*scl, ihgt*scl);
-              ctx.fillStyle="white";
-              ctx.fillText(String(wstm), bx, by);
+              wstm[i] = 2 - (Number(rnum>thre1) + Number(rnum>thre2));
+              var tdata = {
+                number: i+1,
+                lot: wstm[i]
+              }
+              jsPsych.data.write(tdata);
+              //console.log(ctx);
+              ctx.drawImage(stm[wstm[i]], bx, by, iwid*scl, ihgt*scl);
+              //ctx.fillStyle="white";
+              //ctx.fillText(String(wstm), bx, by);
           //}
         }
+        //return wstm;
     }
 
     var fixation = {
