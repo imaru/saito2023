@@ -1,0 +1,232 @@
+<html>
+<head>
+  <title>Gacha test</title>
+  <script src="jspsych-6.3.1/jspsych.js"></script>
+  <script src="jspsych-6.3.1/plugins/jspsych-html-keyboard-response.js"></script>
+  <script src="jspsych-6.3.1/plugins/jspsych-canvas-keyboard-response.js"></script> 
+  <script src="jspsych-6.3.1/plugins/jspsych-html-button-response.js"></script>
+  <script src="jspsych-6.3.1/plugins/jspsych-image-keyboard-response.js"></script>
+  <script src="jspsych-6.3.1/plugins/jspsych-preload.js"></script>
+  <link href="jspsych-6.3.1/css/jspsych.css" rel="stylesheet" type="text/css">
+</head>
+<body bgcolor="#000000", text="#ffffff"></body>
+<style>
+  .image-container {
+    display: flex;
+    overflow: hidden;
+    width: 10%; /* 画面幅いっぱいに表示 */
+  }
+  .image {
+    width: 10%; /* 画像の幅を調整 */
+    max-height: 200px; /* 画像の高さを制限 */
+  }
+</style>
+<script>
+
+var swid = document.documentElement.clientWidth*0.8;
+var shgt = document.documentElement.clientHeight*0.8;
+var nitem = 10;
+var thre1 = 0.9;
+var thre2 = 0.3;
+// var mahouzin = {
+//          type: 'html-keyboard-response',
+//          stimulus: '<img id="cursor" src="img/alchemymod.png">',
+//          choices: jsPsych.NO_KEYS,
+//          trial_duration: 5000,
+//          on_start: function() {
+//            document.addEventListener('mousemove', rotateCursor);
+//          },
+//          on_finish: function() {
+//            document.removeEventListener('mousemove', rotateCursor);
+//            }
+//            };
+
+   function rotateCursor(event) {
+     const cursor = document.getElementById('cursor');
+     const cursorX = event.clientX;
+     const cursorY = event.clientY;
+
+     const centerX = window.innerWidth / 2;
+     const centerY = window.innerHeight / 2;
+
+     const angle = Math.atan2(cursorY - centerY, cursorX - centerX);
+     cursor.style.transform = `rotate(${angle}rad)`;
+   }
+
+   /* create timeline */
+   var timeline = [];
+
+  /* preload images */
+  var preload = {
+    type: 'preload',
+    images: ['img/kan.png'],
+    images: ['img/hei.png'],
+    images: ['img/kai.png']
+  }
+  timeline.push(preload);
+
+      /* define welcome message trial */
+      var welcome = {
+      type: "html-keyboard-response",
+      stimulus: "Welcome to the experiment. Press any key to begin."
+    };
+    timeline.push(welcome);
+
+    /* define instructions trial */
+    var instructions = {
+      type: "html-keyboard-response",
+      stimulus: `
+        <p>In this experiment, a circle will appear in the center 
+        of the screen.</p><p>If the circle is <strong>blue</strong>, 
+        press the letter F on the keyboard as fast as you can.</p>
+        <p>If the circle is <strong>orange</strong>, press the letter J 
+        as fast as you can.</p>
+        <div style='width: 700px;'>
+        <div style='float: left;'><img src='jspsych-6.3.1/examples/img/blue.png'></img>
+        <p class='small'><strong>Press the F key</strong></p></div>
+        <div style='float: right;'><img src='jspsych-6.3.1/examples/img/orange.png'></img>
+        <p class='small'><strong>Press the J key</strong></p></div>
+        </div>
+        <p>Press any key to begin.</p>
+      `,
+      post_trial_gap: 2000
+    };
+    //timeline.push(instructions);
+
+    /* test trials */
+    function drawBlueL(c){
+        var ctx = c.getContext('2d');
+        const stm = new Array();
+        stm[0] = new Image();
+        stm[0].src = 'img/kan.png';
+        stm[1] = new Image();
+        stm[1].src = 'img/hei.png';
+        stm[2] = new Image();
+        stm[2].src = 'img/kai.png';
+        //const chara = new Image();
+        //chara.src= 'img/kan.png';
+        var iwid = stm[0].width;
+        var ihgt = stm[0].height;
+        var scl = (swid/10)/iwid;
+        for (let i=0; i<nitem; i++){
+            var bx=swid/2-iwid*scl*(nitem/2)+i*iwid*scl;
+            var by=shgt/2-ihgt*scl*.5;
+            var rnum = Math.random();
+            if (rnum>thre1){
+                var wstm = 0;
+            }
+            else if (rnum>thre2){
+                var wstm = 1;
+            }
+            else{
+                var wstm = 2;
+            }
+            console.log(wstm);
+            ctx.drawImage(stm[wstm], bx, by, iwid*scl, ihgt*scl);
+        }
+    }
+
+    var fixation = {
+      type: 'html-keyboard-response',
+      stimulus: '<div style="font-size:60px;">+</div>',
+      choices: jsPsych.NO_KEYS,
+      trial_duration: function(){
+        return jsPsych.randomization.sampleWithoutReplacement([250, 500, 750, 1000, 1250, 1500, 1750, 2000], 1)[0];
+      },
+      data: {
+        task: 'fixation'
+      }
+    }
+    //timeline.push(fixation);
+
+    var showimg = {
+        type: 'html-keyboard-response',
+        stimulus: '<img id="cursor" src="img/kan.png">',
+        //duration: 5000,
+        on_start: function() {
+           document.addEventListener('mousemove', rotateCursor);
+         },
+         on_finish: function() {
+           document.removeEventListener('mousemove', rotateCursor);
+         }
+    }
+
+    var lottery = {
+        type: "canvas-keyboard-response",
+        canvas_size: [shgt, swid],
+        stimulus: drawBlueL,
+        choices: ['f', 'j'],
+        //data: {
+        //    task: 'response',
+        //    correct_response: jsPsych.timelineVariable('correct_response')
+        //},
+    //on_finish: function(data){
+    //     data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
+   }
+
+    
+    //timeline.push(showimg);
+
+    var test_proc = {
+        timeline: [fixation, showimg, lottery],
+        repetitions: 5
+    }
+    timeline.push(test_proc);
+
+    /* start the experiment */
+        jsPsych.init({
+        timeline: timeline,
+        on_finish: function() {
+        jsPsych.data.displayData();
+      }
+    });
+
+
+//    var r = {
+//       timeline: generateTrials(),
+//       on_finish: function() {
+//         }
+//     };
+
+//     function generateTrials() {
+//       const trials = [];
+//       for (let i = 0; i < 10; i++) {
+//         const trial = {
+//           type: 'html-keyboard-response',
+//           stimulus: generateStimulus(),
+//           choices: jsPsych.NO_KEYS,
+//           trial_duration: 200
+//         };
+//         trials.push(trial);
+//       }
+//       return trials;
+//     }
+
+//     function generateStimulus() {
+//       const images = [
+//         'img/R.png',
+//         'img/SR.png',
+//         'img/SSR.png'
+//       ];
+
+//       let stimulus = '<div class="image-container">';
+//       for (let i = 0; i < 10; i++) {
+//         const imageIndex = i % 3; // 0, 1, or 2
+//         stimulus += `<img class="image" src="${images[imageIndex]}">`;
+//       }
+//       stimulus += '</div>';
+
+//       return stimulus;
+//     }
+   
+//     var purosdure={
+//     timeline:[mahouzin ,r],
+//     randomize_order: true,
+//     repetitions: 2,
+// }
+
+//    jsPsych.init({
+//     timeline: [purosdure], // 提示順序の指定
+//   });
+   </script>
+</html>
