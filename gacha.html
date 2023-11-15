@@ -22,7 +22,7 @@
 var swid = document.documentElement.clientWidth*0.8;
 var shgt = document.documentElement.clientHeight*0.8;
 var nitem = 10;
-var thre1 = 0.9;
+var thre1 = 0.95;
 var thre2 = 0.3;
 const stmfl = ['img/kan.png', 'img/hei.png', 'img/kai.png'];
 // var mahouzin = {
@@ -56,9 +56,7 @@ const stmfl = ['img/kan.png', 'img/hei.png', 'img/kai.png'];
   /* preload images */
   var preload = {
     type: 'preload',
-    images: ['img/kan.png'],
-    images: ['img/hei.png'],
-    images: ['img/kai.png'],
+    images: ['img/kan.png','img/hei.png', 'img/kai.png'],
     show_detailed_errors: true
   }
   timeline.push(preload);
@@ -99,18 +97,20 @@ const stmfl = ['img/kan.png', 'img/hei.png', 'img/kai.png'];
           stm[i] = new Image();
           stm[i].src = stmfl[i];
         }
-        var iwid = stm[0].width;
-        var ihgt = stm[0].height;
-        var scl = (swid/10)/iwid;
-        for (let i=0; i<nitem; i++){
-            var bx=swid/2-iwid*scl*(nitem/2)+i*iwid*scl;
-            var by=shgt/2-ihgt*scl*.5;
-            var rnum = Math.random();
-            let wstm = 2 - (Number(rnum>thre1) + Number(rnum>thre2));
-            console.log(ctx.height);
-            ctx.drawImage(stm[wstm], bx, by, iwid*scl, ihgt*scl);
-            //ctx.fillStyle="white";
-            //ctx.fillText(String(wstm), bx, by);
+        //stm[1].onload = function() {
+          var iwid = stm[0].width;
+          var ihgt = stm[0].height;
+          var scl = (swid/10)/iwid;
+          for (let i=0; i<nitem; i++){
+              var bx=swid/2-iwid*scl*(nitem/2)+i*iwid*scl;
+              var by=shgt/2-ihgt*scl*.5;
+              var rnum = Math.random();
+              let wstm = 2 - (Number(rnum>thre1) + Number(rnum>thre2));
+              console.log(ctx);
+              ctx.drawImage(stm[wstm], bx, by, iwid*scl, ihgt*scl);
+              ctx.fillStyle="white";
+              ctx.fillText(String(wstm), bx, by);
+          //}
         }
     }
 
@@ -129,7 +129,7 @@ const stmfl = ['img/kan.png', 'img/hei.png', 'img/kai.png'];
 
     var showimg = {
         type: 'html-keyboard-response',
-        stimulus: '<img id="cursor" src="img/hei.png">',
+        stimulus: '<img id="cursor" src="img/mon.png">',
         //duration: 5000,
         on_start: function() {
            document.addEventListener('mousemove', rotateCursor);
